@@ -1,1 +1,4 @@
 # Dijsktra's algorithm
+
+### pseudokode
+

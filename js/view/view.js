@@ -1,4 +1,4 @@
-import { GRID_ROWS_SIZE, GRID_COLS_SIZE } from "../controller/controller.js";
+import * as controller from "../controller/controller.js"
 
 export { createVisualGrid, updateVisualCell }
 
@@ -14,6 +14,9 @@ function createVisualGrid(rows, cols) {
         for (let col = 0; col < cols; col++) {
             const cell = document.createElement("div");
             cell.classList.add("cell");
+            cell.dataset.row = row
+            cell.dataset.col = col
+            cell.addEventListener("click", controller.handleCellClick)
 
             visualGrid.insertAdjacentElement("beforeend", cell);
         }

@@ -1,3 +1,8 @@
+:root{
+    --grid-rows: 10;
+    --grid-cols: 10;
+}
+
 body {
     background-color: darkgreen;
     display: flex;
@@ -10,9 +15,35 @@ h1{
     margin: 0;
 }
 h4{
-    margin: 8px;
+    margin: 12px;
 }
 
 input {
     width: 40px;
+}
+
+#grid-container {
+    display: grid;
+    justify-content: center;
+    grid-template-rows: repeat(var(--grid-rows), max-content);
+    grid-template-columns: repeat(var(--grid-cols), max-content);
+    margin: 12px;
+}
+
+#control-panel {
+    margin-bottom: 24px;
+}
+
+.cell {
+    background-color: aliceblue;
+    width: 32px;
+    height: 32px;
+    border: 2px solid black;
+    border-radius: 30%;
+    aspect-ratio: 1 / 1;
+    box-sizing: border-box;
+}
+
+.grey-cell {
+    background-color: grey;
 }

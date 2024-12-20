@@ -1,4 +1,4 @@
-:root{
+:root {
     --grid-rows: 10;
     --grid-cols: 10;
 }
@@ -12,10 +12,10 @@ body {
     align-items: center;
 }
 
-h1{
+h1 {
     margin: 0;
 }
-h4{
+h4 {
     margin: 12px;
 }
 
@@ -40,11 +40,19 @@ input {
     width: 32px;
     height: 32px;
     border: 2px solid black;
-    border-radius: 30%;
+    /* border-radius: 30%; */
     aspect-ratio: 1 / 1;
     box-sizing: border-box;
 }
 
-.grey-cell {
-    background-color: grey;
+.cell.available {
+    background-color: aliceblue;
+}
+
+.cell.blocked {
+    background-color: black;
+}
+
+.cell.costly {
+    background-color: dimgray;
 }

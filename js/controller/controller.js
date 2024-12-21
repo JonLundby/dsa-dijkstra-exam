@@ -1,38 +1,73 @@
 "use strict";
 import Grid from "../model/grid.js";
 import * as view from "../view/view.js";
+import graph from "../model/graph.js";
 
 window.addEventListener("load", startApp);
 
-// model værdi referencer
-//  0 = hvid tilgængelig celle
-//  1 = sort blokeret celle
+// grid værdi referencer
+//  0 = grøn start celle
+//  1 = hvid tilgængelig celle
 //  2 = grå cost celle (koster ekstra)
-//  3 = grøn start celle
+//  3 = sort blokeret celle
 //  4 = blå mål celle
 
 // globale variabler
 let GRID_ROWS_SIZE;
 let GRID_COLS_SIZE;
-let model;
+let grid;
 let isDrawing = false;
 let isErasing = false;
-let selectedDrawType = 1;
+let selectedDrawType = 2;
+let isDrawingStart = false;
+let isDrawingGoal = false;
 
 function startApp() {
     // sætter GRID_ROWS_SIZE & GRID_COLS_SIZE til default value
     GRID_ROWS_SIZE = parseInt(document.querySelector("#row-size-input").value);
     GRID_COLS_SIZE = parseInt(document.querySelector("#col-size-input").value);
 
-    // Ny instans a grid model
-    model = new Grid(GRID_ROWS_SIZE, GRID_ROWS_SIZE, 0);
+    // Ny instans a grid grid
+    grid = new Grid(GRID_ROWS_SIZE, GRID_ROWS_SIZE, 0);
 
-    resizeGridModel();
+    resizeGrid();
 
     // EVENTLISTENERS
-    // resize model og visual grid når bruger ændrer row/col input
-    document.querySelector("#row-size-input").addEventListener("change", resizeGridModel);
-    document.querySelector("#col-size-input").addEventListener("change", resizeGridModel);
+    // resize grid og visual grid når bruger ændrer row/col input
+    document.querySelector("#row-size-input").addEventListener("change", resizeGrid);
+    document.querySelector("#col-size-input").addEventListener("change", resizeGrid);
+
+    // tegn start og stop celler
+    document.querySelector("#draw-start-checkbox").addEventListener("change", () => {
+        const drawSelection = document.querySelector("#select-draw");
+        const drawGoal = document.querySelector("#draw-goal-checkbox");
+        if (!isDrawingStart) {
+            isDrawingStart = true;
+            drawSelection.disabled = true;
+            drawGoal.disabled = true;
+            selectedDrawType = 0;
+        } else {
+            isDrawingStart = false;
+            drawSelection.disabled = false;
+            drawGoal.disabled = false;
+            selectedDrawType = parseInt(drawSelection.value);
+        }
+    });
+    document.querySelector("#draw-goal-checkbox").addEventListener("change", () => {
+        const drawSelection = document.querySelector("#select-draw");
+        const drawStart = document.querySelector("#draw-start-checkbox");
+        if (!isDrawingGoal) {
+            isDrawingGoal = true;
+            drawSelection.disabled = true;
+            drawStart.disabled = true;
+            selectedDrawType = 4;
+        } else {
+            isDrawingGoal = false;
+            drawStart.disabled = false;
+            drawSelection.disabled = false;
+            selectedDrawType = parseInt(drawSelection.value);
+        }
+    });
 
     // lytter på valg af drawType
     document.querySelector("#select-draw").addEventListener("change", () => {
@@ -41,7 +76,7 @@ function startApp() {
     });
 
     // mousedown aktivere "viskelæder" eller "blyant" alt efter hvad event.target.classList indeholder...
-    // ... og kalder updateDrawingModel (kun så længe mousedown sker over grid-container elementet)
+    // ... og kalder updateDrawingGrid (kun så længe mousedown sker over grid-container elementet)
     document.querySelector("#grid-container").addEventListener("mousedown", (e) => {
         if (e.target.classList.contains("available")) {
             isDrawing = true;
@@ -50,13 +85,13 @@ function startApp() {
             isDrawing = false;
             isErasing = true;
         }
-        updateDrawingModel(e);
+        updateDrawingGrid(e);
     });
 
-    // lytter på mousemove og kalder updateDrawingModel hvis isDrawing eller isErasing er true
+    // lytter på mousemove og kalder updateDrawingGrid hvis isDrawing eller isErasing er true
     document.querySelector("#grid-container").addEventListener("mousemove", (e) => {
         if (isDrawing || isErasing) {
-            updateDrawingModel(e);
+            updateDrawingGrid(e);
         }
     });
 
@@ -68,19 +103,20 @@ function startApp() {
 }
 
 // ændre grid størrelse og opdaterer model
-function resizeGridModel() {
+function resizeGrid() {
     // opdater GRID_ROWS_SIZE & GRID_COLS_SIZE
     GRID_ROWS_SIZE = parseInt(document.querySelector("#row-size-input").value);
     GRID_COLS_SIZE = parseInt(document.querySelector("#col-size-input").value);
-    // opdatere selve modeller / laver en ny
-    model = new Grid(GRID_ROWS_SIZE, GRID_COLS_SIZE, 0);
+    // opdatere selve griddet (ændre instansen til en ny)
+    grid = new Grid(GRID_ROWS_SIZE, GRID_COLS_SIZE, 1);
 
     // opdater det visuelle grid
     view.createVisualGrid(GRID_ROWS_SIZE, GRID_COLS_SIZE);
+    gridToGraph(grid);
 }
 
-// opdater tegnet model
-function updateDrawingModel(e) {
+// opdater tegnet grid
+function updateDrawingGrid(e) {
     const row = parseInt(e.target.dataset.row); // dataset giver en string værdi og må konverteres/parses til number/int..
     const col = parseInt(e.target.dataset.col);
     let cell = e.target;
@@ -88,16 +124,40 @@ function updateDrawingModel(e) {
 
     if (isDrawing) {
         // cellen der bliver klikket på opdateres baseret på drawType
-        model.set(row, col, selectedDrawType);
-        cellValue = model.get(row, col);
+        grid.set(row, col, selectedDrawType);
+        cellValue = grid.get(row, col);
         view.updateVisualCell(cell, cellValue);
     }
 
     if (isErasing) {
-        model.set(row, col, 0);
-        cellValue = model.get(row, col);
+        grid.set(row, col, 1);
+        cellValue = grid.get(row, col);
         view.updateVisualCell(cell, cellValue);
     }
 
-    console.table(model.grid);
+    // console.table(grid.grid);
+    gridToGraph(grid);
+}
+
+// laver griddet om til graph (adjacencylist) hvor navnet på hver key er koordinat på celle...
+// ... og hver key(celle) har liste med nabo-celle objekter hvor hver nabo har koordinater som key...
+// ... og en distance baseret på cellens farve
+function gridToGraph(grid) {
+    for (let i = 0; i < grid.rows; i++) {
+        for (let j = 0; j < grid.cols; j++) {
+            const key = `${i}, ${j}`; // key på hver celle
+            graph[key] = {}; // vertex / celle oprettes
+            const neighbours = grid.neighbours(i, j); // cellens naboer
+            for (let n = 0; n < neighbours.length; n++) {
+                const neighbourKey = `${neighbours[n].row}, ${neighbours[n].col}`; // finder nabo koordinat som string
+                // console.log("neighbour to ", key, "is: ", neighbourKey);
+                const distance = grid.grid[neighbours[n].row][neighbours[n].col]; // finder nabocellernes værdier
+                console.log("distance: ", distance);
+
+                graph[key][neighbourKey] = distance;
+            }
+        }
+    }
+    console.log("GRID: ", grid);
+    console.log("GRAPH: ", graph);
 }

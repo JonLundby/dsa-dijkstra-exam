@@ -45,14 +45,24 @@ input {
     box-sizing: border-box;
 }
 
+.cell.start {
+    background-color: green;
+    opacity: 0.7;
+}
+
+.cell.goal {
+    background-color: blue;
+    opacity: 0.7;
+}
+
 .cell.available {
     background-color: aliceblue;
 }
 
-.cell.blocked {
-    background-color: black;
-}
-
 .cell.costly {
     background-color: dimgray;
+}
+
+.cell.blocked {
+    background-color: black;
 }

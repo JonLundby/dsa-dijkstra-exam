@@ -24,16 +24,38 @@ function createVisualGrid(rows, cols) {
 // Visuel opdatering af enkelte celler
 function updateVisualCell(cell, cellValue) {
     if (cellValue === 0) {
-        cell.classList.remove("blocked");
+        cell.classList.remove("goal");
+        cell.classList.remove("available");
         cell.classList.remove("costly");
-        cell.classList.add("available");
+        cell.classList.remove("blocked");
+        cell.classList.add("start");
     }
     if (cellValue === 1) {
-        cell.classList.add("blocked");
-        cell.classList.remove("available");
+        cell.classList.remove("start");
+        cell.classList.remove("costly");
+        cell.classList.remove("blocked");
+        cell.classList.remove("goal");
+        cell.classList.add("available");
     }
     if (cellValue === 2) {
-        cell.classList.add("costly");
+        cell.classList.remove("start");
         cell.classList.remove("available");
+        cell.classList.remove("blocked");
+        cell.classList.remove("goal");
+        cell.classList.add("costly");
+    }
+    if (cellValue === 3) {
+        cell.classList.remove("start");
+        cell.classList.remove("available");
+        cell.classList.remove("blocked");
+        cell.classList.remove("goal");
+        cell.classList.add("blocked");
+    }
+    if (cellValue === 4) {
+        cell.classList.remove("start");
+        cell.classList.remove("available");
+        cell.classList.remove("costly");
+        cell.classList.remove("blocked");
+        cell.classList.add("goal");
     }
 }

@@ -10,6 +10,7 @@ export default class Grid {
         let grid = [];
         for (let i = 0; i < rows; i++) {
             grid.push([]);
+
             for (let j = 0; j < cols; j++) {
                 if (cellValue || cellValue === null || cellValue === 0) {
                     grid[i].push(cellValue);
@@ -28,7 +29,7 @@ export default class Grid {
         }
         // ellers returner et objekt med row og col. På denne måde er row og col altid defineret som objektet {row: arg1, col: arg2}
         else {
-            arg1 = parseInt(arg1)
+            arg1 = parseInt(arg1);
             return { row: arg1, col: arg2 };
         }
     }
@@ -95,8 +96,8 @@ export default class Grid {
         }
     }
 
-    neighbours(arg1, arg2) {        
-        const { row, col } = this._parsePosition(arg1, arg2);        
+    neighbours(arg1, arg2) {
+        const { row, col } = this._parsePosition(arg1, arg2);
         let neighboursActual = [];
 
         if (this._isValidPosition(row, col)) {
@@ -110,7 +111,7 @@ export default class Grid {
                 { row: row + 1, col }, // syd
                 { row: row + 1, col: col - 1 }, // syd-vest
                 { row: row + 1, col: col + 1 }, // syd-øst
-            ];            
+            ];
 
             // filtrere de nabo positioner der er uden for griddet
             neighboursActual = potentialNeighbours.filter((pos) => this._isValidPosition(pos.row, pos.col));

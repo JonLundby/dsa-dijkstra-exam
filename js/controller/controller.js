@@ -1,7 +1,7 @@
 "use strict";
 import Grid from "../model/grid.js";
 import * as view from "../view/view.js";
-import graph from "../model/graph.js";
+import AdjacencyList from "../model/adjacencyList.js";
 
 window.addEventListener("load", startApp);
 
@@ -16,6 +16,7 @@ window.addEventListener("load", startApp);
 let GRID_ROWS_SIZE;
 let GRID_COLS_SIZE;
 let grid;
+let adjacencyList;
 let isDrawing = false;
 let isErasing = false;
 let selectedDrawType = 2;
@@ -36,6 +37,9 @@ function startApp() {
     // resize grid og visual grid når bruger ændrer row/col input
     document.querySelector("#row-size-input").addEventListener("change", resizeGrid);
     document.querySelector("#col-size-input").addEventListener("change", resizeGrid);
+
+    // find path btn
+    document.querySelector("#find-path-btn").addEventListener("click", dijkstraSearch)
 
     // tegn start og stop celler
     document.querySelector("#draw-start-checkbox").addEventListener("change", () => {
@@ -112,7 +116,6 @@ function resizeGrid() {
 
     // opdater det visuelle grid
     view.createVisualGrid(GRID_ROWS_SIZE, GRID_COLS_SIZE);
-    gridToGraph(grid);
 }
 
 // opdater tegnet grid
@@ -136,28 +139,33 @@ function updateDrawingGrid(e) {
     }
 
     // console.table(grid.grid);
-    gridToGraph(grid);
 }
 
-// laver griddet om til graph (adjacencylist) hvor navnet på hver key er koordinat på celle...
+// laver griddet om til adjacencylist hvor navnet på hver key er koordinat på celle...
 // ... og hver key(celle) har liste med nabo-celle objekter hvor hver nabo har koordinater som key...
 // ... og en distance baseret på cellens farve
-function gridToGraph(grid) {
+function gridToAdjacencyList(grid) {
+    adjacencyList = new AdjacencyList();
     for (let i = 0; i < grid.rows; i++) {
         for (let j = 0; j < grid.cols; j++) {
             const key = `${i}, ${j}`; // key på hver celle
-            graph[key] = {}; // vertex / celle oprettes
+            adjacencyList.list[key] = {}; // vertex / celle oprettes
             const neighbours = grid.neighbours(i, j); // cellens naboer
             for (let n = 0; n < neighbours.length; n++) {
                 const neighbourKey = `${neighbours[n].row}, ${neighbours[n].col}`; // finder nabo koordinat som string
                 // console.log("neighbour to ", key, "is: ", neighbourKey);
                 const distance = grid.grid[neighbours[n].row][neighbours[n].col]; // finder nabocellernes værdier
                 console.log("distance: ", distance);
-
-                graph[key][neighbourKey] = distance;
+                
+                adjacencyList.list[key][neighbourKey] = distance;
             }
         }
     }
     console.log("GRID: ", grid);
-    console.log("GRAPH: ", graph);
+    console.log("ADJACENCYLIST: ", adjacencyList);
+}
+
+function dijkstraSearch() {
+    gridToAdjacencyList(grid)
+
 }

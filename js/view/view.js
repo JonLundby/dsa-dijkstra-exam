@@ -1,3 +1,5 @@
+import { setStartCell } from "../controller/controller.js";
+
 export { createVisualGrid, updateVisualCell };
 
 function createVisualGrid(rows, cols) {
@@ -29,6 +31,7 @@ function updateVisualCell(cell, cellValue) {
         cell.classList.remove("costly");
         cell.classList.remove("blocked");
         cell.classList.add("start");
+        setStartCell(cell)
     }
     if (cellValue === 1) {
         cell.classList.remove("start");

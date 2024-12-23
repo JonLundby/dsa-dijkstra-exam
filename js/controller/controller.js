@@ -2,6 +2,9 @@
 import Grid from "../model/grid.js";
 import * as view from "../view/view.js";
 import AdjacencyList from "../model/adjacencyList.js";
+import PriorityQueue from "../model/priorityQueue.js";
+
+export { setStartCell };
 
 window.addEventListener("load", startApp);
 
@@ -22,6 +25,7 @@ let isErasing = false;
 let selectedDrawType = 2;
 let isDrawingStart = false;
 let isDrawingGoal = false;
+let startCell = {};
 
 function startApp() {
     // sætter GRID_ROWS_SIZE & GRID_COLS_SIZE til default value
@@ -39,7 +43,10 @@ function startApp() {
     document.querySelector("#col-size-input").addEventListener("change", resizeGrid);
 
     // find path btn
-    document.querySelector("#find-path-btn").addEventListener("click", dijkstraSearch)
+    document.querySelector("#find-path-btn").addEventListener("click", () => {
+        gridToAdjacencyList(grid);
+        dijkstraSearch(adjacencyList, startCell);
+    });
 
     // tegn start og stop celler
     document.querySelector("#draw-start-checkbox").addEventListener("change", () => {
@@ -76,7 +83,7 @@ function startApp() {
     // lytter på valg af drawType
     document.querySelector("#select-draw").addEventListener("change", () => {
         selectedDrawType = parseInt(document.querySelector("#select-draw").value);
-        console.log(selectedDrawType);
+        // console.log(selectedDrawType);
     });
 
     // mousedown aktivere "viskelæder" eller "blyant" alt efter hvad event.target.classList indeholder...
@@ -141,6 +148,11 @@ function updateDrawingGrid(e) {
     // console.table(grid.grid);
 }
 
+function setStartCell(cell) {
+    const coords = `${cell.dataset.row}, ${cell.dataset.col}`;
+    startCell[coords] = 0; // grid.get(`${cell.dataset.row}`, `${cell.dataset.col}`);
+}
+
 // laver griddet om til adjacencylist hvor navnet på hver key er koordinat på celle...
 // ... og hver key(celle) har liste med nabo-celle objekter hvor hver nabo har koordinater som key...
 // ... og en distance baseret på cellens farve
@@ -151,21 +163,51 @@ function gridToAdjacencyList(grid) {
             const key = `${i}, ${j}`; // key på hver celle
             adjacencyList.list[key] = {}; // vertex / celle oprettes
             const neighbours = grid.neighbours(i, j); // cellens naboer
+
             for (let n = 0; n < neighbours.length; n++) {
                 const neighbourKey = `${neighbours[n].row}, ${neighbours[n].col}`; // finder nabo koordinat som string
                 // console.log("neighbour to ", key, "is: ", neighbourKey);
                 const distance = grid.grid[neighbours[n].row][neighbours[n].col]; // finder nabocellernes værdier
-                console.log("distance: ", distance);
-                
+                // console.log("distance: ", distance);
+
+                // tilføjer distancen(cellen cellValue i griddet) som value til hver nabo
                 adjacencyList.list[key][neighbourKey] = distance;
             }
         }
     }
-    console.log("GRID: ", grid);
-    console.log("ADJACENCYLIST: ", adjacencyList);
+    // console.log("GRID: ", grid);
+    // console.log("ADJACENCYLIST: ", adjacencyList);
 }
 
-function dijkstraSearch() {
-    gridToAdjacencyList(grid)
+function dijkstraSearch(adjacencyList, startCell) {
+    // sætter startCellCoordsStr til at være en string værdi af startcelle objektets første key
+    let startCellCoordsKey = Object.keys(startCell)[0];
+    // initialisere pQ og distances
+    let priorityQueue = new PriorityQueue();
+    let distances = {};
+    let prev = {};
+    // let cells = Object.keys(adjacencyList.list); // laver object om til array for at kunne bruge den som iterable
 
+    // indsætter start cellen i distances og pQ som et object {x,x: 0}...
+    // ... hvor x,x er koordinat og 0 er distancen (0 fordi det er startcelle)
+    distances[startCellCoordsKey] = 0;
+    priorityQueue.add_with_priority(startCellCoordsKey, 0);
+
+    for (const key in adjacencyList.list) {
+        // initialisere distances, pq & prev med default start values Infinity og undefined
+        if (key !== startCellCoordsKey) {
+            distances[key] = Infinity;
+            priorityQueue.add_with_priority(key, Infinity);
+        }
+        prev[key] = undefined;
+    }
+
+    
+    while (priorityQueue.size() > 0) {
+        
+    }
+
+    console.log("PQ populated with start{x,x: 0} and rest {x,x: infinity}: : ", priorityQueue.queue);
+    console.log("Distances populated with start{x,x: 0} and rest {x,x: infinity}: ", distances);
+    console.log("prev populated with all keys with value undefined ", prev);
 }

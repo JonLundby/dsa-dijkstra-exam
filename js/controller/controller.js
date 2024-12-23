@@ -28,6 +28,30 @@ let isDrawingGoal = false;
 let startCell = {};
 
 function startApp() {
+    let pq_test = new PriorityQueue()
+
+    // console.log("empty pq: ", pq_test);
+    // console.log("pq size 0: ", pq_test.size());
+    
+    console.log("indsætter: {0,0: 1}");
+    pq_test.insert("0,0", 1)
+    console.log("pq med 1 element {0,0: 1}: ", pq_test);
+    
+    console.log("indsætter: {0,1: 3}");
+    pq_test.insert("0,1", 3)
+    
+    console.log("indsætter: {0,2: 7}");
+    pq_test.insert("0,2", 7)
+    
+    console.log("indsætter: {1,0: 2}");
+    pq_test.insert("1,0", 2)
+    console.log("pq med 2 elementer: ", pq_test);
+    
+    console.log("------");
+    console.log("rearrangeret pq: ", pq_test);
+    
+
+
     // sætter GRID_ROWS_SIZE & GRID_COLS_SIZE til default value
     GRID_ROWS_SIZE = parseInt(document.querySelector("#row-size-input").value);
     GRID_COLS_SIZE = parseInt(document.querySelector("#col-size-input").value);
@@ -160,7 +184,7 @@ function gridToAdjacencyList(grid) {
     adjacencyList = new AdjacencyList();
     for (let i = 0; i < grid.rows; i++) {
         for (let j = 0; j < grid.cols; j++) {
-            const key = `${i}, ${j}`; // key på hver celle
+            const key = `${i}, ${j}`; // key på hver celle som string
             adjacencyList.list[key] = {}; // vertex / celle oprettes
             const neighbours = grid.neighbours(i, j); // cellens naboer
 
@@ -191,23 +215,24 @@ function dijkstraSearch(adjacencyList, startCell) {
     // indsætter start cellen i distances og pQ som et object {x,x: 0}...
     // ... hvor x,x er koordinat og 0 er distancen (0 fordi det er startcelle)
     distances[startCellCoordsKey] = 0;
-    priorityQueue.add_with_priority(startCellCoordsKey, 0);
+    priorityQueue.insert(startCellCoordsKey, 0);
 
     for (const key in adjacencyList.list) {
         // initialisere distances, pq & prev med default start values Infinity og undefined
         if (key !== startCellCoordsKey) {
+
             distances[key] = Infinity;
-            priorityQueue.add_with_priority(key, Infinity);
+            priorityQueue.insert(key, Infinity);
         }
         prev[key] = undefined;
     }
 
     
-    while (priorityQueue.size() > 0) {
+    // while (priorityQueue.size() > 0) {
         
-    }
+    // }
 
-    console.log("PQ populated with start{x,x: 0} and rest {x,x: infinity}: : ", priorityQueue.queue);
-    console.log("Distances populated with start{x,x: 0} and rest {x,x: infinity}: ", distances);
-    console.log("prev populated with all keys with value undefined ", prev);
+    // console.log("PQ populated with start{x,x: 0} and rest {x,x: infinity}: : ", priorityQueue.queue);
+    // console.log("Distances populated with start{x,x: 0} and rest {x,x: infinity}: ", distances);
+    // console.log("prev populated with all keys with value undefined ", prev);
 }

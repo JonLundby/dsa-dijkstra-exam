@@ -1,5 +1,10 @@
 export default class AdjacencyList {
     constructor() {
-        this.list = {}
+        this.list = []
     }
 }
+// export default class AdjacencyList {
+//     constructor() {
+//         this.list = {}
+//     }
+// }

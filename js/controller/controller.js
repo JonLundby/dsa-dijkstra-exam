@@ -26,38 +26,9 @@ let isErasing = false;
 let selectedDrawType = 2;
 let isDrawingStart = false;
 let isDrawingGoal = false;
-let startCell = {};
 let startCellIndex = 0;
 
 function startApp() {
-    // **************  TEST PQ AREA **************  \\
-    // let pq_test = new PriorityQueue()
-
-    // console.log("empty pq: ", pq_test);
-    // console.log("pq size 0: ", pq_test.size());
-
-    // console.log("indsætter: {0,0: 1}");
-    // pq_test.insert("0,0", 1)
-    // console.log("pq med 1 element {0,0: 1}: ", pq_test);
-
-    // console.log("indsætter: {0,1: 3}");
-    // pq_test.insert("0,1", 3)
-
-    // console.log("indsætter: {0,2: 7}");
-    // pq_test.insert("0,2", 7)
-
-    // console.log("indsætter: {1,0: 2}");
-    // pq_test.insert("1,0", 2)
-    // console.log("pq med 2 elementer: ", pq_test);
-
-    // console.log("------");
-    // console.log("rearrangeret pq: ", pq_test);
-
-    // console.log("------");
-    // pq_test.extractMin()
-    // console.log("min extracted, expect 2, 3, 7: ", pq_test);
-    // **************  TEST PQ AREA **************  \\
-
     // sætter GRID_ROWS_SIZE & GRID_COLS_SIZE til default value
     GRID_ROWS_SIZE = parseInt(document.querySelector("#row-size-input").value);
     GRID_COLS_SIZE = parseInt(document.querySelector("#col-size-input").value);
@@ -213,25 +184,34 @@ function setStartCell(cell) {
 // }
 function gridToAdjacencyList(grid) {
     adjacencyList = new AdjacencyList();
+
+    // pusher ny node til adjacencylist for hver celle i griddet med weight baseret på cellValue
     for (let row = 0; row < grid.rows; row++) {
         for (let col = 0; col < grid.cols; col++) {
-            // ny node pr celle pushes til adjacencyList
             const newCellNode = new Node(row, col, grid.get(row, col));
             adjacencyList.list.push(newCellNode);
+        }
+    }
+
+    // gennemgår griddet igen og finder hver celle fra adjacencylisten
+    for (let row = 0; row < grid.rows; row++) {
+        for (let col = 0; col < grid.cols; col++) {
+            const cellIndex = row * grid.cols + col;
+            const currentCell = adjacencyList.list[cellIndex];
 
             // finder naboer i til celle i griddet
             const neighbours = grid.neighbours(row, col);
-            // finder nuværende newCellNode's index i adjacency list
-            const newCellNodeIndex = row * grid.cols + col;
-            adjacencyList.list[newCellNodeIndex].neighbours = neighbours;
+
+            // hver nabo hentes fra adjacencylisten og pushes til currentCells neighbours..
+            // ... vigtigt at cellens naboer findes fra adjacencylisten således at de senere har den samme reference i priority queue
+            for (const n of neighbours) {
+                const nIndex = grid.indexFor(n.row, n.col);
+                const nFromAdjacencyList = adjacencyList.list[nIndex];
+                currentCell.neighbours.push(nFromAdjacencyList);
+            }
         }
     }
-    // console.table(grid.grid);
-    // console.log("ADJACENCYLIST: ", adjacencyList.list);
-    // console.log(adjacencyList.list[0].row);
-    // console.log(adjacencyList.list[0].col);
-    // console.log(adjacencyList.list[0].neighbours[0].row);
-    // console.log(adjacencyList.list[0].neighbours[0].col);
+    // console.log(adjacencyList.list);
 }
 
 function dijkstraSearch(adjacencyList, startCellIndex) {
@@ -240,91 +220,50 @@ function dijkstraSearch(adjacencyList, startCellIndex) {
     let distances = [];
     let prev = [];
     let startCellObj = adjacencyList.list[startCellIndex];
-    // console.log(startCellObj);
 
     // // indsætter start cellen i distances og pQ som et object {x,x: 0}...
     // // ... hvor x,x er koordinat og 0 er distancen (0 fordi det er startcelle)
     distances.push(adjacencyList.list[startCellIndex]);
-    // priorityQueue.insert(startCellObj); // INDKOMMENTER FOR RIGTIG TEST!!!
+    priorityQueue.insert(startCellObj);
     prev.push(startCellObj);
 
-    // // pq test -----------------------
-    // let myNode1 = new Node(0, 0, 1);
-    // let myNode3 = new Node(0, 1, 3);
-    // let myNode7 = new Node(0, 2, 7);
-    // let myNode2 = new Node(1, 0, 2);
-    // let myNode9 = new Node(1, 1, 9);
-    // let myNode4 = new Node(1, 2, 4);
-    // let myNode5 = new Node(2, 0, 5);
-    // priorityQueue.insert(myNode1);
-    // priorityQueue.insert(myNode3);
-    // priorityQueue.insert(myNode7);
-    // priorityQueue.insert(myNode2);
-    // priorityQueue.insert(myNode9);
-    // priorityQueue.insert(myNode4);
-    // priorityQueue.insert(myNode5);
-    // priorityQueue.insert(myNode2);
-
-    // INDKOMMENTER FOR RIGTIG TEST!!!
     for (const element of adjacencyList.list) {
-        // giver alle elementer/celler/noder en weight på Infinity og pusher dem til PQ og distances
-        // "&& element.weight !== 3" kan tilføjes for at gøre sorte celler til faste mure
+        // "&& element.weight !== 3" kan tilføjes for at gøre sorte celler til faste mure der ikke kan besøges (blokeringer)
         if (element !== startCellObj) {
-            const elementWithInfinity = element;
-            elementWithInfinity.weight = Infinity;
+            // giver alle elementer en weight på Infinity og pusher dem til PQ og distances
+            // element.distanceFromStart = Infinity; // ikke nødvendigt da det er default og bliver overskrevet senere
             distances.push(element);
             priorityQueue.insert(element);
-            // alle elementer/celler/noder har allerede default som predecessor ved instantiering
-            // alle elementer/celler/noder pushes til prev som holder på stien til den korteste rute
+
+            // alle elementer har allerede default som predecessor ved instantiering
+            // alle elementer pushes til prev som holder på stien til den korteste rute
             prev.push(element);
         }
     }
 
-    // console.log(priorityQueue.size());
+    while (priorityQueue.size() > 9) {
+        console.log("---- while iteration ----");
 
-    while (priorityQueue.size() > 0) {
-        priorityQueue.extractMin();
+        const u = priorityQueue.extractMin();
+        console.log("u extracted from pq: ", u);
+
+        for (const n of u.neighbours) {
+            const alt = u.weight + n.weight;            
+
+            const nIndex = n.row * grid.cols + n.col;
+
+            if (alt < distances[nIndex].weight) {
+                prev[nIndex].predecessor = u;
+                distances[nIndex].weight = alt;
+                
+                console.log(n.pqIndex);
+                priorityQueue.decreasePriority(n.pqIndex, alt);
+            }
+        }
     }
-    console.log("PQ populated with start{x,x: 0} and rest {x,x: infinity}: : ", priorityQueue.queue);
-
-    // console.log("AdjacencyListen: ", adjacencyList);
-
-    // console.log("PQ populated with start{x,x: 0} and rest {x,x: infinity}: : ", priorityQueue.queue);
-    // console.log("Distances populated with start{x,x: 0} and rest {x,x: infinity}: ", distances);
-    // console.log("prev populated with all keys with value undefined ", prev);
+    
+    console.log("AD, should be unaffected clean grid (only with updated drawing/weights)", adjacencyList.list);
+    console.log("PQ populated with start{x,x: 0} and rest {x,x: infinity}: ", priorityQueue.queue);
+    console.log("Distances populated with start{x,x: 0} and rest {x,x: infinity}: ", distances);
+    console.log("prev populated with all keys with value undefined: ", prev);
 }
-
-// function dijkstraSearch(adjacencyList, startCell) {
-//     // sætter startCellCoordsStr til at være en string værdi af startcelle objektets første key
-//     let startCellCoordsKey = Object.keys(startCell)[0];
-//     // initialisere pQ og distances
-//     let priorityQueue = new PriorityQueue();
-//     let distances = {};
-//     let prev = {};
-//     // let cells = Object.keys(adjacencyList.list); // laver object om til array for at kunne bruge den som iterable
-
-//     // indsætter start cellen i distances og pQ som et object {x,x: 0}...
-//     // ... hvor x,x er koordinat og 0 er distancen (0 fordi det er startcelle)
-//     distances[startCellCoordsKey] = 0;
-//     priorityQueue.insert(startCellCoordsKey, 0);
-
-//     for (const key in adjacencyList.list) {
-//         // initialisere distances, pq & prev med default start values Infinity og undefined
-//         if (key !== startCellCoordsKey) {
-
-//             distances[key] = Infinity;
-//             priorityQueue.insert(key, Infinity);
-//         }
-//         prev[key] = undefined;
-//     }
-
-//     // while (priorityQueue.size() > 0) {
-
-//     // }
-
-//     console.log("AdjacencyListen: ", adjacencyList);
-
-//     console.log("PQ populated with start{x,x: 0} and rest {x,x: infinity}: : ", priorityQueue.queue);
-//     console.log("Distances populated with start{x,x: 0} and rest {x,x: infinity}: ", distances);
-//     console.log("prev populated with all keys with value undefined ", prev);
-// }

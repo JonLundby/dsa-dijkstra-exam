@@ -18,20 +18,58 @@ export default class PriorityQueue {
     }
 
     insert(node) {
-        // pusher den modtagne node til køen
-        this.queue.push(node);
-
         let queue = this.queue;
+
+        // pusher ny node og sætter i til længden af queue
+        queue.push(node);
         let i = queue.length - 1;
 
-        // while i ikke er out of bounds og parent til indsatte node har større værdi end indsatte node
+        // tilføjer nodens index plads som property pqIndex for senere at kunne bruge den ved kald på .decreasePriority
+        node.pqIndex = i;
+
+        // while "i" ikke er første indsatte i tom queue og parent til indsatte node har større værdi end indsatte node
         while (i > 0 && queue[this.getParentIndex(i)].weight > queue[i].weight) {
-            // hvis parentObj er noget så findes parents index og bytter med
+            // finder index på parent
             let p = this.getParentIndex(i);
-            let temp = queue[i]; // holder på queue[i] objektet før det overskrives
-            queue[i] = queue[p]; // overskriver queue[i] med dens parent(queue[p])
-            queue[p] = temp; // parent
-            i = p; // i sættes til parents index så loopet kan boble videre op om nødvendigt
+
+            // holder på queue[i] objektet og queue[i].pqIndex value før de overskrives
+            let temp = queue[i];
+            let tempPqIndex = queue[i].pqIndex;
+
+            // // temp (queue[i]) og [p] bytter pqIndex
+            temp.pqIndex = queue[p].pqIndex;
+            queue[p].pqIndex = tempPqIndex;
+
+            // overskriver queue[i] med dens parent(queue[p]) og child overskrives med child fra temp
+            queue[i] = queue[p];
+            queue[p] = temp;
+
+            // i sættes til parents index så loopet kan boble videre op om nødvendigt
+            i = p;
+        }
+    }
+
+    decreasePriority(i, value) {
+        let queue = this.queue;
+        // en node på i's index plads i queue får tildelt ny weight
+        queue[i].weight = value;
+
+        // så længe i ikke er 0 er der ingen parent at sammenligne med og da værdien (weight) allerede må være korrekt sorteret og kun...
+        // ...decreases så er værdien stadig den mindste
+        // && så længe i's parent's værdi er større så skal der byttes om på child og parent
+        while (i !== 0 && queue[this.getParentIndex(i)].weight > queue[i].weight) {
+            let p = this.getParentIndex(i);
+
+            let temp = queue[i];
+            let tempIndex = queue[i].pqIndex;
+
+            temp.pqIndex = queue[p].pqIndex;
+            queue[p].pqIndex = tempIndex;
+
+            queue[i] = queue[p];
+            queue[p] = temp;
+
+            i = p;
         }
     }
 
@@ -46,9 +84,12 @@ export default class PriorityQueue {
         // gemmer root som senere kan returneres
         let rootTemp = queue[0];
 
-        //overskriver roden med sidst indsatte child og fjerner sidst indsatte child (som er slutningen af q/arr)
+        // overskriver roden med sidst indsatte child og fjerner sidst indsatte child (som er slutningen af queue)
         queue[0] = queue[queue.length - 1];
         queue.pop();
+
+        // opdatere ny pqIndex værdi til den nye root node
+        queue[0].pqIndex = 0;
 
         // kalder miHeapify til at rearrangere
         this.minHeapify(0);
@@ -81,9 +122,16 @@ export default class PriorityQueue {
         // hvis left eller right child har en værdi mindre end i's værdi så skal i og child bytte plads
         if (lowestValueIndex !== i) {
             let temp = queue[i];
+            let tempPqIndex = queue[i].pqIndex;
+
+            // bytter property pqIndex
+            queue[i].pqIndex = queue[lowestValueIndex].pqIndex;
+            queue[lowestValueIndex].pqIndex = tempPqIndex;
+            // bytter PQ index plads
             queue[i] = queue[lowestValueIndex];
             queue[lowestValueIndex] = temp;
-            this.minHeapify(lowestValueIndex); // minHeapify kaldes igen med index af enten left eller right child så ombytning forsætter
+            // minHeapify kaldes igen med index af enten left eller right child så ombytning forsætter
+            this.minHeapify(lowestValueIndex);
         }
     }
 

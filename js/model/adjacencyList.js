@@ -3,8 +3,3 @@ export default class AdjacencyList {
         this.list = []
     }
 }
-// export default class AdjacencyList {
-//     constructor() {
-//         this.list = {}
-//     }
-// }

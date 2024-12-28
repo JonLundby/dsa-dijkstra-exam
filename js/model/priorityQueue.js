@@ -24,11 +24,11 @@ export default class PriorityQueue {
         queue.push(node);
         let i = queue.length - 1;
 
-        // tilføjer nodens index plads som property pqIndex for senere at kunne bruge den ved kald på .decreasePriority
+        // tilføjer nodens index plads som property pqIndex for senere at kunne bruge den ved kald på .decreasePriority        
         node.pqIndex = i;
 
         // while "i" ikke er første indsatte i tom queue og parent til indsatte node har større værdi end indsatte node
-        while (i > 0 && queue[this.getParentIndex(i)].weight > queue[i].weight) {
+        while (i > 0 && queue[this.getParentIndex(i)].distanceFromStart > queue[i].distanceFromStart) {
             // finder index på parent
             let p = this.getParentIndex(i);
 
@@ -51,13 +51,13 @@ export default class PriorityQueue {
 
     decreasePriority(i, value) {
         let queue = this.queue;
-        // en node på i's index plads i queue får tildelt ny weight
-        queue[i].weight = value;
+        // en node på i's index plads i queue får tildelt ny distanceFromStart
+        queue[i].distanceFromStart = value;
 
-        // så længe i ikke er 0 er der ingen parent at sammenligne med og da værdien (weight) allerede må være korrekt sorteret og kun...
+        // så længe i ikke er 0 er der ingen parent at sammenligne med og da værdien (distanceFromStart) allerede må være korrekt sorteret og kun...
         // ...decreases så er værdien stadig den mindste
         // && så længe i's parent's værdi er større så skal der byttes om på child og parent
-        while (i !== 0 && queue[this.getParentIndex(i)].weight > queue[i].weight) {
+        while (i !== 0 && queue[this.getParentIndex(i)].distanceFromStart > queue[i].distanceFromStart) {
             let p = this.getParentIndex(i);
 
             let temp = queue[i];
@@ -111,12 +111,12 @@ export default class PriorityQueue {
 
         // leftIndex < queue.length = out of bounds check
         // hvis venstre child har lavere værdi end parent så sættes leftIndex som værende den der har den lavere værdi
-        if (leftIndex < queue.length && queue[leftIndex].weight < queue[i].weight) {
+        if (leftIndex < queue.length && queue[leftIndex].distanceFromStart < queue[i].distanceFromStart) {
             lowestValueIndex = leftIndex;
         }
         // hvis højre child er mindre end i's value eller venstre's value...
         // ... (i tilfælde af at venstre child skulle have overskrevet lowestValue som ellers er index i som udgangspunkt)
-        if (rightIndex < queue.length && queue[rightIndex].weight < queue[lowestValueIndex].weight) {
+        if (rightIndex < queue.length && queue[rightIndex].distanceFromStart < queue[lowestValueIndex].distanceFromStart) {
             lowestValueIndex = rightIndex;
         }
         // hvis left eller right child har en værdi mindre end i's værdi så skal i og child bytte plads

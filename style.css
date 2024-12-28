@@ -5,7 +5,7 @@
 
 body {
     user-select: none;
-    background-color: darkgreen;
+    background-color: dimgray;
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -14,15 +14,24 @@ body {
 
 h1 {
     margin: 0;
+    margin-bottom: 12px;
 }
 h4 {
     margin: 12px;
 }
 
-input {
-    width: 40px;
+input, #animation-speed-input{
+    width: 60px;
 }
 
+input, #row-size-input, #col-size-input{
+    width: 40px;
+}
+input, #draw-start-checkbox, #draw-goal-checkbox{
+    width: 12px;
+}
+
+/* GRID */
 #grid-container {
     display: grid;
     justify-content: center;
@@ -31,38 +40,46 @@ input {
     margin: 12px;
 }
 
+/* KONTROL PANEL */
 #control-panel {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
+/* CELLER */
 .cell {
     background-color: aliceblue;
     width: 32px;
     height: 32px;
-    border: 1px dashed lightseagreen;
-    /* border-radius: 15%; */
+    border: 3px solid darkslategray;
+    border-radius: 32%;
     aspect-ratio: 1 / 1;
     box-sizing: border-box;
 }
 
 .cell.start {
-    background-color: green;
-    opacity: 0.7;
+    background-color: #2a07ed;
 }
 
 .cell.goal {
-    background-color: blue;
-    opacity: 0.7;
+    background-color: #30e7d8;
 }
 
-.cell.available {
-    background-color: aliceblue;
+.cell.whiteFlat {
+    background-color: #138451;
 }
 
-.cell.costly {
-    background-color: dimgray;
+.cell.greyHill {
+    background-color: #F0E442;
 }
 
-.cell.blocked {
-    background-color: black;
+.cell.blackBlocked {
+    background-color: #b90f2b;
+}
+.cell.path {
+    background-color: #5ac9df;
+}
+
+.cell.visited {
+    /* background-color: aqua; */
+    border: 1px dashed #e69d0059;
 }

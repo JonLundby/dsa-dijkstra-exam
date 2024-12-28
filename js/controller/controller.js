@@ -5,36 +5,56 @@ import AdjacencyList from "../model/adjacencyList.js";
 import PriorityQueue from "../model/priorityQueue.js";
 import Node from "../model/Node.js";
 
-export { setStartCell };
+export { setStartCell, setGoalCell, animationSpeed };
 
 window.addEventListener("load", startApp);
 
-// grid værdi referencer
+//  draw types & grid værdi referencer
 //  0 = grøn start celle
-//  1 = hvid tilgængelig celle
-//  2 = grå cost celle (koster ekstra)
-//  3 = sort blokeret celle
-//  4 = blå mål celle
+let greenStart = 0;
+//  1 = blå mål celle
+let blueGoal = 1;
+//  2 = hvid fladt terræn celle
+let whiteFlat = 2;
+//  3 = grå bakke celle (koster ekstra)
+let greyHill = 3;
+//  5 = sort blokeret celle
+let blackBlocked = 4;
 
 // globale variabler
+// grid
 let GRID_ROWS_SIZE;
 let GRID_COLS_SIZE;
 let grid;
+// drawing
 let adjacencyList;
 let isDrawing = false;
 let isErasing = false;
-let selectedDrawType = 2;
+let selectedDrawType = greyHill;
 let isDrawingStart = false;
 let isDrawingGoal = false;
-let startCellIndex = 0;
+let animationSpeed;
+// start & goal celler
+let startCellIndex;
+let goalCellIndex; // celle i nederste højre hjørne er default goal cellen
 
 function startApp() {
     // sætter GRID_ROWS_SIZE & GRID_COLS_SIZE til default value
     GRID_ROWS_SIZE = parseInt(document.querySelector("#row-size-input").value);
     GRID_COLS_SIZE = parseInt(document.querySelector("#col-size-input").value);
 
+    // deaktiver search/find-path-btn indtil start & goal er sat
+    document.querySelector("#find-path-btn").disabled = true;
+
+    // animation-speed-input
+    animationSpeed = document.querySelector("#animation-speed-input").value;
+    document.querySelector("#animation-speed-input").addEventListener("change", () => {
+        animationSpeed = document.querySelector("#animation-speed-input").value;        
+    });
+
     // Ny instans a grid grid
-    grid = new Grid(GRID_ROWS_SIZE, GRID_ROWS_SIZE, 0);
+    grid = new Grid(GRID_ROWS_SIZE, GRID_ROWS_SIZE, whiteFlat);
+    // goalCellIndex = grid.rows * grid.cols;
 
     resizeGrid();
 
@@ -49,7 +69,7 @@ function startApp() {
         dijkstraSearch(adjacencyList, startCellIndex);
     });
 
-    // tegn start og stop celler
+    // lytter på om bruger vil tegne start cellen
     document.querySelector("#draw-start-checkbox").addEventListener("change", () => {
         const drawSelection = document.querySelector("#select-draw");
         const drawGoal = document.querySelector("#draw-goal-checkbox");
@@ -57,7 +77,7 @@ function startApp() {
             isDrawingStart = true;
             drawSelection.disabled = true;
             drawGoal.disabled = true;
-            selectedDrawType = 0;
+            selectedDrawType = greenStart;
         } else {
             isDrawingStart = false;
             drawSelection.disabled = false;
@@ -65,6 +85,8 @@ function startApp() {
             selectedDrawType = parseInt(drawSelection.value);
         }
     });
+
+    // lytter på om bruger vil tegne mål cellen
     document.querySelector("#draw-goal-checkbox").addEventListener("change", () => {
         const drawSelection = document.querySelector("#select-draw");
         const drawStart = document.querySelector("#draw-start-checkbox");
@@ -72,7 +94,7 @@ function startApp() {
             isDrawingGoal = true;
             drawSelection.disabled = true;
             drawStart.disabled = true;
-            selectedDrawType = 4;
+            selectedDrawType = blueGoal;
         } else {
             isDrawingGoal = false;
             drawStart.disabled = false;
@@ -84,13 +106,12 @@ function startApp() {
     // lytter på valg af drawType
     document.querySelector("#select-draw").addEventListener("change", () => {
         selectedDrawType = parseInt(document.querySelector("#select-draw").value);
-        // console.log(selectedDrawType);
     });
 
     // mousedown aktivere "viskelæder" eller "blyant" alt efter hvad event.target.classList indeholder...
     // ... og kalder updateDrawingGrid (kun så længe mousedown sker over grid-container elementet)
     document.querySelector("#grid-container").addEventListener("mousedown", (e) => {
-        if (e.target.classList.contains("available")) {
+        if (e.target.classList.contains("whiteFlat")) {
             isDrawing = true;
             isErasing = false;
         } else {
@@ -119,8 +140,16 @@ function resizeGrid() {
     // opdater GRID_ROWS_SIZE & GRID_COLS_SIZE
     GRID_ROWS_SIZE = parseInt(document.querySelector("#row-size-input").value);
     GRID_COLS_SIZE = parseInt(document.querySelector("#col-size-input").value);
+
+    if (GRID_ROWS_SIZE > 50) {
+        GRID_ROWS_SIZE = 50;
+    }
+    if (GRID_COLS_SIZE > 50) {
+        GRID_COLS_SIZE = 50;
+    }
+
     // opdatere selve griddet (ændre instansen til en ny)
-    grid = new Grid(GRID_ROWS_SIZE, GRID_COLS_SIZE, 1);
+    grid = new Grid(GRID_ROWS_SIZE, GRID_COLS_SIZE, whiteFlat);
 
     // opdater det visuelle grid
     view.createVisualGrid(GRID_ROWS_SIZE, GRID_COLS_SIZE);
@@ -141,47 +170,35 @@ function updateDrawingGrid(e) {
     }
 
     if (isErasing) {
-        grid.set(row, col, 1);
+        grid.set(row, col, whiteFlat);
         cellValue = grid.get(row, col);
         view.updateVisualCell(cell, cellValue);
     }
-
     // console.table(grid.grid);
 }
 
 function setStartCell(cell) {
-    // const coords = `${cell.dataset.row}, ${cell.dataset.col}`;
-    // startCell[coords] = 0; // grid.get(`${cell.dataset.row}`, `${cell.dataset.col}`);
     const row = parseInt(cell.dataset.row);
     const col = parseInt(cell.dataset.col);
     startCellIndex = row * grid.cols + col;
+
+    // check om start og goal er sat
+    if (startCellIndex > -1 && goalCellIndex > -1) {
+        document.querySelector("#find-path-btn").disabled = false;
+    }
 }
 
-// laver griddet om til adjacencylist hvor navnet på hver key er koordinat på celle...
-// ... og hver key(celle) har liste med nabo-celle objekter hvor hver nabo har koordinater som key...
-// ... og en distance baseret på cellens farve
-// function gridToAdjacencyList(grid) {
-//     adjacencyList = new AdjacencyList();
-//     for (let i = 0; i < grid.rows; i++) {
-//         for (let j = 0; j < grid.cols; j++) {
-//             const key = `${i}, ${j}`; // key på hver celle som string
-//             adjacencyList.list[key] = {}; // vertex / celle oprettes
-//             const neighbours = grid.neighbours(i, j); // cellens naboer
+function setGoalCell(cell) {
+    const row = parseInt(cell.dataset.row);
+    const col = parseInt(cell.dataset.col);
+    goalCellIndex = row * grid.cols + col;
 
-//             for (let n = 0; n < neighbours.length; n++) {
-//                 const neighbourKey = `${neighbours[n].row}, ${neighbours[n].col}`; // finder nabo koordinat som string
-//                 // console.log("neighbour to ", key, "is: ", neighbourKey);
-//                 const distance = grid.grid[neighbours[n].row][neighbours[n].col]; // finder nabocellernes værdier
-//                 // console.log("distance: ", distance);
+    // check om start og goal er sat
+    if (startCellIndex > -1 && goalCellIndex > -1) {
+        document.querySelector("#find-path-btn").disabled = false;
+    }
+}
 
-//                 // tilføjer distancen(cellen cellValue i griddet) som value til hver nabo
-//                 adjacencyList.list[key][neighbourKey] = distance;
-//             }
-//         }
-//     }
-//     // console.log("GRID: ", grid);
-//     // console.log("ADJACENCYLIST: ", adjacencyList);
-// }
 function gridToAdjacencyList(grid) {
     adjacencyList = new AdjacencyList();
 
@@ -214,56 +231,83 @@ function gridToAdjacencyList(grid) {
     // console.log(adjacencyList.list);
 }
 
-function dijkstraSearch(adjacencyList, startCellIndex) {
+async function dijkstraSearch(adjacencyList, startCellIndex) {
     // initialisere pQ, distances & prev samt start object
     let priorityQueue = new PriorityQueue();
-    let distances = [];
-    let prev = [];
+    // let distances = [];
+    // let prev = [];
     let startCellObj = adjacencyList.list[startCellIndex];
+    startCellObj.distanceFromStart = 0;
+    startCellObj.weight = 0;
+    startCellObj.isVisited = true;
 
     // // indsætter start cellen i distances og pQ som et object {x,x: 0}...
     // // ... hvor x,x er koordinat og 0 er distancen (0 fordi det er startcelle)
-    distances.push(adjacencyList.list[startCellIndex]);
     priorityQueue.insert(startCellObj);
-    prev.push(startCellObj);
 
     for (const element of adjacencyList.list) {
         // "&& element.weight !== 3" kan tilføjes for at gøre sorte celler til faste mure der ikke kan besøges (blokeringer)
-        if (element !== startCellObj) {
-            // giver alle elementer en weight på Infinity og pusher dem til PQ og distances
-            // element.distanceFromStart = Infinity; // ikke nødvendigt da det er default og bliver overskrevet senere
-            distances.push(element);
+        if (element !== startCellObj && element.weight !== blackBlocked) {
+            // alle elementer undtagen start pushes fra adjacencylist til priorityQueue...
+            // ... elementerne har allerede "distanceFromStart = Infinity" & "predecessor = undefined" som default
             priorityQueue.insert(element);
-
-            // alle elementer har allerede default som predecessor ved instantiering
-            // alle elementer pushes til prev som holder på stien til den korteste rute
-            prev.push(element);
         }
     }
 
-    while (priorityQueue.size() > 9) {
-        console.log("---- while iteration ----");
+    while (priorityQueue.size() > 0) {
+        // console.log("---- while iteration ----");
 
         const u = priorityQueue.extractMin();
-        console.log("u extracted from pq: ", u);
+        u.isVisited = true;
+        // console.log("u extracted from pq: ", u);
+
+        // bryder while loopet hvis mål cellen findes / bliver besøgt
+        if (u === adjacencyList.list[goalCellIndex]) {
+            break;
+        }
 
         for (const n of u.neighbours) {
-            const alt = u.weight + n.weight;            
+            // hvis nabo noden ikke er visited (når den er visited så er den allerede opdateret med den laveste distanceFromStart)...
+            // ... && hvis ikke det er en mur
+            if (!n.isVisited && n.weight !== blackBlocked) {
+                // sammenlægger noden u's distance fra start med naboens weight, altså en beregning den samlede distance fra start til den nye nabo node...
+                const alt = u.distanceFromStart + n.weight;
 
-            const nIndex = n.row * grid.cols + n.col;
+                // finder index på den nabo der itereres over
+                const nIndex = n.row * grid.cols + n.col;
 
-            if (alt < distances[nIndex].weight) {
-                prev[nIndex].predecessor = u;
-                distances[nIndex].weight = alt;
-                
-                console.log(n.pqIndex);
-                priorityQueue.decreasePriority(n.pqIndex, alt);
+                // hvis den alternative distance (alt) er mindre en nabo nodens distance fra start så er der fundet en ny hurtigere rute til nabo noden...
+                // ... og denne nye distance opdateres på nabo nodens distanceFromStart property
+                if (alt < n.distanceFromStart) {
+                    // prev[nIndex].predecessor = u;
+                    // distances[nIndex].distanceFromStart = alt;
+                    adjacencyList.list[nIndex].predecessor = u;
+                    adjacencyList.list[nIndex].distanceFromStart = alt;
+
+                    // opdatere nabo nodens distanceFromStart property gennem priority queue som rearrangere nodernes prioritet
+                    priorityQueue.decreasePriority(n.pqIndex, alt);
+
+                    // besøgte noder visualiseres
+                    const visualCell = document.querySelector(`#grid-container .cell[data-row="${n.row}"][data-col="${n.col}"]`);
+                    await view.markCellVisited(visualCell);
+                }
             }
         }
     }
-    
-    console.log("AD, should be unaffected clean grid (only with updated drawing/weights)", adjacencyList.list);
-    console.log("PQ populated with start{x,x: 0} and rest {x,x: infinity}: ", priorityQueue.queue);
-    console.log("Distances populated with start{x,x: 0} and rest {x,x: infinity}: ", distances);
-    console.log("prev populated with all keys with value undefined: ", prev);
+    let current = adjacencyList.list[goalCellIndex].predecessor;
+    calculatePath(current);
+}
+
+async function calculatePath(current) {
+
+    // base case: hvis current er start cellen så er stien fundet nbaglæns
+    if (current === adjacencyList.list[startCellIndex]) {
+        return;
+    }
+    const visualCell = document.querySelector(`#grid-container .cell[data-row="${current.row}"][data-col="${current.col}"]`);
+    await view.markPathCells(visualCell);
+
+    current = current.predecessor;
+
+    calculatePath(current);
 }

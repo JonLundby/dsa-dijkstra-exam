@@ -1,4 +1,4 @@
-import { setStartCell } from "../controller/controller.js";
+import { setStartCell, setGoalCell, animationSpeed } from "../controller/controller.js";
 
 export { createVisualGrid, updateVisualCell };
 
@@ -14,7 +14,7 @@ function createVisualGrid(rows, cols) {
         for (let col = 0; col < cols; col++) {
             const cell = document.createElement("div");
             cell.classList.add("cell");
-            cell.classList.add("available");
+            cell.classList.add("whiteFlat");
             cell.dataset.row = row;
             cell.dataset.col = col;
 
@@ -27,38 +27,61 @@ function createVisualGrid(rows, cols) {
 function updateVisualCell(cell, cellValue) {
     if (cellValue === 0) {
         cell.classList.remove("goal");
-        cell.classList.remove("available");
-        cell.classList.remove("costly");
-        cell.classList.remove("blocked");
-        cell.classList.add("start");
-        setStartCell(cell)
+        cell.classList.remove("whiteFlat");
+        cell.classList.remove("greyHill");
+        cell.classList.remove("blackBlocked");
+        cell.classList.add("start");        
+        setStartCell(cell);
+        console.log("visual start cell: ", cell);
     }
     if (cellValue === 1) {
         cell.classList.remove("start");
-        cell.classList.remove("costly");
-        cell.classList.remove("blocked");
-        cell.classList.remove("goal");
-        cell.classList.add("available");
+        cell.classList.remove("whiteFlat");
+        cell.classList.remove("greyHill");
+        cell.classList.remove("blackBlocked");
+        cell.classList.add("goal");
+        setGoalCell(cell)        
     }
     if (cellValue === 2) {
         cell.classList.remove("start");
-        cell.classList.remove("available");
-        cell.classList.remove("blocked");
+        cell.classList.remove("greyHill");
+        cell.classList.remove("blackBlocked");
         cell.classList.remove("goal");
-        cell.classList.add("costly");
+        cell.classList.add("whiteFlat");
     }
     if (cellValue === 3) {
         cell.classList.remove("start");
-        cell.classList.remove("available");
-        cell.classList.remove("blocked");
+        cell.classList.remove("whiteFlat");
+        cell.classList.remove("blackBlocked");
         cell.classList.remove("goal");
-        cell.classList.add("blocked");
+        cell.classList.add("greyHill");
     }
     if (cellValue === 4) {
         cell.classList.remove("start");
-        cell.classList.remove("available");
-        cell.classList.remove("costly");
-        cell.classList.remove("blocked");
-        cell.classList.add("goal");
+        cell.classList.remove("whiteFlat");
+        cell.classList.remove("blackBlocked");
+        cell.classList.remove("goal");
+        cell.classList.add("blackBlocked");
     }
+}
+
+export async function markCellVisited(cell) {
+    cell.classList.add("visited");
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, animationSpeed);
+    });
+}
+
+export async function markPathCells(cell) {
+    cell.classList.add("path");
+    
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, animationSpeed);
+    });
+    
 }

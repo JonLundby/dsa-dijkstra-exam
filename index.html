@@ -10,23 +10,28 @@
 <body>
     <h1>Dijkstras algorithm</h1>
 
-    <h4>control panel</h4>
+    <!-- <h4>control panel</h4> -->
     <section id="control-panel">
         <!-- change grid size -->
         <label for="row-size-input">rows:</label>
-        <input type="number" name="row-size-input" id="row-size-input" value="3">
+        <input type="number" name="row-size-input" id="row-size-input" value="16" max="50">
         <label for="col-size-input">colums:</label>
-        <input type="number" name="col-size-input" id="col-size-input" value="3">
+        <input type="number" name="col-size-input" id="col-size-input" value="30" max="50">
         
         <!-- select draw type -->
         <label for="select-draw">select draw</label>
         <select name="select-draw" id="select-draw">
             <!-- <option value="0">start</option> -->
-            <option value="2">grey</option>
-            <option value="3">black</option>
+            <option value="3">grey</option>
+            <option value="4">black</option>
             <!-- <option value="4">goal</option> -->
         </select>
+        
+        <!-- animation speed -->
+        <label for="animation-speed-input">speed(ms):</label>
+        <input type="number" name="animation-speed-input" id="animation-speed-input" value="30" max="10000">
 
+        <!-- find path/search -->
         <button id="find-path-btn">Find path</button>
 
         <!-- set start/goal -->

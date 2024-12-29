@@ -216,8 +216,8 @@ function gridToAdjacencyList(grid) {
         }
     }
 
+    // gennemgår adjacencyListen og tilføjer respektive naboer til hver node (naboerne refereres fra adjacencylisten selv)
     for (const node of adjacencyList.list) {
-        // const cellIndex = grid.indexFor(node.row, node.col);
         const neighbours = grid.neighbours(node.row, node.col);
 
         for (const n of neighbours) {
@@ -246,9 +246,6 @@ function gridToAdjacencyList(grid) {
     //         }
     //     }
     // }
-    console.log("adjacencyList: ", adjacencyList);
-
-    // console.log(adjacencyList.list);
 }
 
 async function dijkstraSearch(adjacencyList, startCellIndex) {
@@ -261,25 +258,23 @@ async function dijkstraSearch(adjacencyList, startCellIndex) {
 
     // // indsætter start cellen i distances og pQ som et object {x,x: 0}...
     // // ... hvor x,x er koordinat og 0 er distancen (0 fordi det er startcelle)
-    priorityQueue.insert(startCellObj);
+    priorityQueue.insert(startCellObj); // --- O(log V) ---
 
+    // --- O(V) ---
     for (const element of adjacencyList.list) {
         // "&& element.weight !== 3" kan tilføjes for at gøre sorte celler til faste mure der ikke kan besøges (blokeringer)
         if (element !== startCellObj && element.weight !== mountainBlocked) {
             // alle elementer undtagen start pushes fra adjacencylist til priorityQueue...
             // ... elementerne har allerede "distanceFromStart = Infinity" & "predecessor = undefined" som default
-            priorityQueue.insert(element);
+            priorityQueue.insert(element); // --- O(log V) ---
         }
     }
 
     while (priorityQueue.size() > 0) {
-        // console.log("---- while iteration ----");
-
-        const u = priorityQueue.extractMin();
+        const u = priorityQueue.extractMin(); // --- O(log V) ---
         u.isVisited = true;
-        // console.log("u extracted from pq: ", u);
 
-        // besøgte noder visualiseres
+        // den besøgte node visualiseres
         const visualCell = document.querySelector(`#grid-container .cell[data-row="${u.row}"][data-col="${u.col}"]`);
         await view.markCellVisited(visualCell);
 
@@ -288,6 +283,7 @@ async function dijkstraSearch(adjacencyList, startCellIndex) {
             break;
         }
 
+        // --- O(E) ---
         for (const n of u.neighbours) {
             // hvis nabo noden ikke er visited (når den er visited så er den allerede opdateret med den laveste distanceFromStart)...
             // ... && hvis ikke det er en mur
@@ -305,15 +301,12 @@ async function dijkstraSearch(adjacencyList, startCellIndex) {
                     adjacencyList.list[nIndex].distanceFromStart = alt;
 
                     // opdatere nabo nodens distanceFromStart property gennem priority queue som rearrangere nodernes prioritet
-                    priorityQueue.decreasePriority(n.pqIndex, alt);
-
-                    // // besøgte noder visualiseres
-                    // const visualCell = document.querySelector(`#grid-container .cell[data-row="${n.row}"][data-col="${n.col}"]`);
-                    // await view.markCellVisited(visualCell);
+                    priorityQueue.decreasePriority(n.pqIndex, alt); // --- O(log V) ---
                 }
             }
         }
     }
+
     let current = adjacencyList.list[goalCellIndex].predecessor;
     calculatePath(current);
 }

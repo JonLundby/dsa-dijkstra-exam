@@ -1,4 +1,4 @@
-# Dijsktra's algorithm
+# Dijkstra's algorithm
 
 ### pseudokode
 

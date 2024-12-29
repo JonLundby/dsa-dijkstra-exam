@@ -5,7 +5,7 @@ import AdjacencyList from "../model/adjacencyList.js";
 import PriorityQueue from "../model/priorityQueue.js";
 import Node from "../model/Node.js";
 
-export { setStartCell, setGoalCell, animationSpeed };
+export { setStartCell, setGoalCell, animationSpeed, greenStart, blueGoal, greenFlat, greyHill, mountainBlocked };
 
 window.addEventListener("load", startApp);
 
@@ -17,7 +17,7 @@ let blueGoal = 1;
 //  2 = hvid fladt terræn celle
 let greenFlat = 2;
 //  3 = grå bakke celle (koster ekstra)
-let brownHill = 3;
+let greyHill = 3;
 //  5 = sort blokeret celle
 let mountainBlocked = 4;
 
@@ -30,7 +30,7 @@ let grid;
 let adjacencyList;
 let isDrawing = false;
 let isErasing = false;
-let selectedDrawType = brownHill;
+let selectedDrawType = greyHill;
 let isDrawingStart = false;
 let isDrawingGoal = false;
 let animationSpeed;

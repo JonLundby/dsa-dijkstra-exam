@@ -75,7 +75,7 @@ input, #draw-start-checkbox, #draw-goal-checkbox{
     background-color: #138451;
 }
 
-.cell.brownHill {
+.cell.greyHill {
     background-color: rgb(88, 93, 95);
 }
 

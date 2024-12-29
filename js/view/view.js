@@ -1,6 +1,6 @@
-import { setStartCell, setGoalCell, animationSpeed } from "../controller/controller.js";
+import { setStartCell, setGoalCell, animationSpeed, greenStart, blueGoal, greenFlat, greyHill, mountainBlocked } from "../controller/controller.js";
 
-export { createVisualGrid, updateVisualCell };
+export { createVisualGrid, updateVisualCell, greenStart, blueGoal, greenFlat, greyHill, mountainBlocked };
 
 function createVisualGrid(rows, cols) {
     const visualGrid = document.querySelector("#grid-container");
@@ -25,41 +25,41 @@ function createVisualGrid(rows, cols) {
 
 // Visuel opdatering af enkelte celler
 function updateVisualCell(cell, cellValue) {
-    if (cellValue === 0) {
+    if (cellValue === greenStart) {
         cell.classList.remove("goal");
         cell.classList.remove("greenFlat");
-        cell.classList.remove("brownHill");
+        cell.classList.remove("greyHill");
         cell.classList.remove("mountainBlocked");
         cell.classList.add("start");        
         cell.textContent = "🚶‍♂️";
         setStartCell(cell);
     }
-    if (cellValue === 1) {
+    if (cellValue === blueGoal) {
         cell.classList.remove("start");
         cell.classList.remove("greenFlat");
-        cell.classList.remove("brownHill");
+        cell.classList.remove("greyHill");
         cell.classList.remove("mountainBlocked");
         cell.classList.add("goal");
         cell.textContent = "🏁";
         setGoalCell(cell)
     }
-    if (cellValue === 2) {
+    if (cellValue === greenFlat) {
         cell.classList.remove("start");
-        cell.classList.remove("brownHill");
+        cell.classList.remove("greyHill");
         cell.classList.remove("mountainBlocked");
         cell.classList.remove("goal");
         cell.classList.add("greenFlat");
         cell.textContent = "";
     }
-    if (cellValue === 3) {
+    if (cellValue === greyHill) {
         cell.classList.remove("start");
         cell.classList.remove("greenFlat");
         cell.classList.remove("mountainBlocked");
         cell.classList.remove("goal");
-        cell.classList.add("brownHill");
+        cell.classList.add("greyHill");
         cell.textContent = "";
     }
-    if (cellValue === 4) {
+    if (cellValue === mountainBlocked) {
         cell.classList.remove("start");
         cell.classList.remove("greenFlat");
         cell.classList.remove("mountainBlocked");

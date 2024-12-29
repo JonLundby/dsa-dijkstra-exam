@@ -28,26 +28,25 @@ function updateVisualCell(cell, cellValue) {
     if (cellValue === 0) {
         cell.classList.remove("goal");
         cell.classList.remove("greenFlat");
-        cell.classList.remove("yellowSand");
-        cell.classList.remove("blueWater");
+        cell.classList.remove("brownHill");
+        cell.classList.remove("mountainBlocked");
         cell.classList.add("start");        
         cell.textContent = "🚶‍♂️";
         setStartCell(cell);
-        console.log("visual start cell: ", cell);
     }
     if (cellValue === 1) {
         cell.classList.remove("start");
         cell.classList.remove("greenFlat");
-        cell.classList.remove("yellowSand");
-        cell.classList.remove("blueWater");
+        cell.classList.remove("brownHill");
+        cell.classList.remove("mountainBlocked");
         cell.classList.add("goal");
         cell.textContent = "🏁";
         setGoalCell(cell)
     }
     if (cellValue === 2) {
         cell.classList.remove("start");
-        cell.classList.remove("yellowSand");
-        cell.classList.remove("blueWater");
+        cell.classList.remove("brownHill");
+        cell.classList.remove("mountainBlocked");
         cell.classList.remove("goal");
         cell.classList.add("greenFlat");
         cell.textContent = "";
@@ -55,17 +54,17 @@ function updateVisualCell(cell, cellValue) {
     if (cellValue === 3) {
         cell.classList.remove("start");
         cell.classList.remove("greenFlat");
-        cell.classList.remove("blueWater");
+        cell.classList.remove("mountainBlocked");
         cell.classList.remove("goal");
-        cell.classList.add("yellowSand");
+        cell.classList.add("brownHill");
         cell.textContent = "";
     }
     if (cellValue === 4) {
         cell.classList.remove("start");
         cell.classList.remove("greenFlat");
-        cell.classList.remove("blueWater");
+        cell.classList.remove("mountainBlocked");
         cell.classList.remove("goal");
-        cell.classList.add("blueWater");
+        cell.classList.add("mountainBlocked");
         cell.textContent = "";
     }
 }

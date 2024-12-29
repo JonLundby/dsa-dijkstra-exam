@@ -103,12 +103,12 @@ export default class Grid {
         if (this._isValidPosition(row, col)) {
             // tilføjer potentielle naboer inkl. diagonale
             const potentialNeighbours = [
-                { row: row - 1, col: col - 1 }, // nord-vest
                 { row: row - 1, col }, // nord
-                { row: row - 1, col: col + 1 }, // nord-øst
+                { row: row + 1, col }, // syd
                 { row, col: col - 1 }, // vest
                 { row, col: col + 1 }, // øst
-                { row: row + 1, col }, // syd
+                { row: row - 1, col: col - 1 }, // nord-vest
+                { row: row - 1, col: col + 1 }, // nord-øst
                 { row: row + 1, col: col - 1 }, // syd-vest
                 { row: row + 1, col: col + 1 }, // syd-øst
             ];

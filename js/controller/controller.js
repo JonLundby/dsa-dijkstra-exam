@@ -17,9 +17,9 @@ let blueGoal = 1;
 //  2 = hvid fladt terræn celle
 let greenFlat = 2;
 //  3 = grå bakke celle (koster ekstra)
-let yellowSand = 3;
+let brownHill = 3;
 //  5 = sort blokeret celle
-let blueWater = 4;
+let mountainBlocked = 4;
 
 // globale variabler
 // grid
@@ -30,7 +30,7 @@ let grid;
 let adjacencyList;
 let isDrawing = false;
 let isErasing = false;
-let selectedDrawType = yellowSand;
+let selectedDrawType = brownHill;
 let isDrawingStart = false;
 let isDrawingGoal = false;
 let animationSpeed;
@@ -216,24 +216,38 @@ function gridToAdjacencyList(grid) {
         }
     }
 
-    // gennemgår griddet igen og finder hver celle fra adjacencylisten
-    for (let row = 0; row < grid.rows; row++) {
-        for (let col = 0; col < grid.cols; col++) {
-            const cellIndex = row * grid.cols + col;
-            const currentCell = adjacencyList.list[cellIndex];
+    for (const node of adjacencyList.list) {
+        // const cellIndex = grid.indexFor(node.row, node.col);
+        const neighbours = grid.neighbours(node.row, node.col);
 
-            // finder naboer i til celle i griddet
-            const neighbours = grid.neighbours(row, col);
-
-            // hver nabo hentes fra adjacencylisten og pushes til currentCells neighbours..
-            // ... vigtigt at cellens naboer findes fra adjacencylisten således at de senere har den samme reference i priority queue
-            for (const n of neighbours) {
-                const nIndex = grid.indexFor(n.row, n.col);
-                const nFromAdjacencyList = adjacencyList.list[nIndex];
-                currentCell.neighbours.push(nFromAdjacencyList);
-            }
+        for (const n of neighbours) {
+            const nIndex = grid.indexFor(n.row, n.col);
+            const nFromAdjacencyList = adjacencyList.list[nIndex];
+            node.neighbours.push(nFromAdjacencyList);
         }
     }
+
+    // // gennemgår griddet igen og finder hver celles index svarende til det fra adjacencylisten
+    // for (let row = 0; row < grid.rows; row++) {
+    //     for (let col = 0; col < grid.cols; col++) {
+    //         const cellIndex = row * grid.cols + col;
+    //         const currentCell = adjacencyList.list[cellIndex];
+
+    //         // finder naboer til celle via griddet
+    //         const neighbours = grid.neighbours(row, col);
+
+    //         // hver nabo hentes fra adjacencylisten og pushes til currentCells neighbours..
+    //         // ... vigtigt at cellens naboer findes fra adjacencylisten således at de senere har den samme reference i priority queue
+    //         for (const n of neighbours) {
+    //             // finder naboens index fra griddet som er svarende til index i adjacencylisten
+    //             const nIndex = grid.indexFor(n.row, n.col);
+    //             const nFromAdjacencyList = adjacencyList.list[nIndex];
+    //             currentCell.neighbours.push(nFromAdjacencyList);
+    //         }
+    //     }
+    // }
+    console.log("adjacencyList: ", adjacencyList);
+
     // console.log(adjacencyList.list);
 }
 
@@ -251,7 +265,7 @@ async function dijkstraSearch(adjacencyList, startCellIndex) {
 
     for (const element of adjacencyList.list) {
         // "&& element.weight !== 3" kan tilføjes for at gøre sorte celler til faste mure der ikke kan besøges (blokeringer)
-        if (element !== startCellObj && element.weight !== blueWater) {
+        if (element !== startCellObj && element.weight !== mountainBlocked) {
             // alle elementer undtagen start pushes fra adjacencylist til priorityQueue...
             // ... elementerne har allerede "distanceFromStart = Infinity" & "predecessor = undefined" som default
             priorityQueue.insert(element);
@@ -265,6 +279,10 @@ async function dijkstraSearch(adjacencyList, startCellIndex) {
         u.isVisited = true;
         // console.log("u extracted from pq: ", u);
 
+        // besøgte noder visualiseres
+        const visualCell = document.querySelector(`#grid-container .cell[data-row="${u.row}"][data-col="${u.col}"]`);
+        await view.markCellVisited(visualCell);
+
         // bryder while loopet hvis mål cellen findes / bliver besøgt
         if (u === adjacencyList.list[goalCellIndex]) {
             break;
@@ -273,7 +291,7 @@ async function dijkstraSearch(adjacencyList, startCellIndex) {
         for (const n of u.neighbours) {
             // hvis nabo noden ikke er visited (når den er visited så er den allerede opdateret med den laveste distanceFromStart)...
             // ... && hvis ikke det er en mur
-            if (!n.isVisited && n.weight !== blueWater) {
+            if (!n.isVisited && n.weight !== mountainBlocked) {
                 // sammenlægger noden u's distance fra start med naboens weight, altså en beregning den samlede distance fra start til den nye nabo node...
                 const alt = u.distanceFromStart + n.weight;
 
@@ -289,9 +307,9 @@ async function dijkstraSearch(adjacencyList, startCellIndex) {
                     // opdatere nabo nodens distanceFromStart property gennem priority queue som rearrangere nodernes prioritet
                     priorityQueue.decreasePriority(n.pqIndex, alt);
 
-                    // besøgte noder visualiseres
-                    const visualCell = document.querySelector(`#grid-container .cell[data-row="${n.row}"][data-col="${n.col}"]`);
-                    await view.markCellVisited(visualCell);
+                    // // besøgte noder visualiseres
+                    // const visualCell = document.querySelector(`#grid-container .cell[data-row="${n.row}"][data-col="${n.col}"]`);
+                    // await view.markCellVisited(visualCell);
                 }
             }
         }

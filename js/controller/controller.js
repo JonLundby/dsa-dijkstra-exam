@@ -15,11 +15,11 @@ let greenStart = 0;
 //  1 = blå mål celle
 let blueGoal = 1;
 //  2 = hvid fladt terræn celle
-let whiteFlat = 2;
+let greenFlat = 2;
 //  3 = grå bakke celle (koster ekstra)
-let greyHill = 3;
+let yellowSand = 3;
 //  5 = sort blokeret celle
-let blackBlocked = 4;
+let blueWater = 4;
 
 // globale variabler
 // grid
@@ -30,7 +30,7 @@ let grid;
 let adjacencyList;
 let isDrawing = false;
 let isErasing = false;
-let selectedDrawType = greyHill;
+let selectedDrawType = yellowSand;
 let isDrawingStart = false;
 let isDrawingGoal = false;
 let animationSpeed;
@@ -53,7 +53,7 @@ function startApp() {
     });
 
     // Ny instans a grid grid
-    grid = new Grid(GRID_ROWS_SIZE, GRID_ROWS_SIZE, whiteFlat);
+    grid = new Grid(GRID_ROWS_SIZE, GRID_ROWS_SIZE, greenFlat);
     // goalCellIndex = grid.rows * grid.cols;
 
     resizeGrid();
@@ -111,7 +111,7 @@ function startApp() {
     // mousedown aktivere "viskelæder" eller "blyant" alt efter hvad event.target.classList indeholder...
     // ... og kalder updateDrawingGrid (kun så længe mousedown sker over grid-container elementet)
     document.querySelector("#grid-container").addEventListener("mousedown", (e) => {
-        if (e.target.classList.contains("whiteFlat")) {
+        if (e.target.classList.contains("greenFlat")) {
             isDrawing = true;
             isErasing = false;
         } else {
@@ -147,9 +147,15 @@ function resizeGrid() {
     if (GRID_COLS_SIZE > 50) {
         GRID_COLS_SIZE = 50;
     }
+    if (GRID_ROWS_SIZE < 3) {
+        GRID_ROWS_SIZE = 3;
+    }
+    if (GRID_COLS_SIZE < 3) {
+        GRID_COLS_SIZE = 3;
+    }
 
     // opdatere selve griddet (ændre instansen til en ny)
-    grid = new Grid(GRID_ROWS_SIZE, GRID_COLS_SIZE, whiteFlat);
+    grid = new Grid(GRID_ROWS_SIZE, GRID_COLS_SIZE, greenFlat);
 
     // opdater det visuelle grid
     view.createVisualGrid(GRID_ROWS_SIZE, GRID_COLS_SIZE);
@@ -170,7 +176,7 @@ function updateDrawingGrid(e) {
     }
 
     if (isErasing) {
-        grid.set(row, col, whiteFlat);
+        grid.set(row, col, greenFlat);
         cellValue = grid.get(row, col);
         view.updateVisualCell(cell, cellValue);
     }
@@ -234,8 +240,6 @@ function gridToAdjacencyList(grid) {
 async function dijkstraSearch(adjacencyList, startCellIndex) {
     // initialisere pQ, distances & prev samt start object
     let priorityQueue = new PriorityQueue();
-    // let distances = [];
-    // let prev = [];
     let startCellObj = adjacencyList.list[startCellIndex];
     startCellObj.distanceFromStart = 0;
     startCellObj.weight = 0;
@@ -247,7 +251,7 @@ async function dijkstraSearch(adjacencyList, startCellIndex) {
 
     for (const element of adjacencyList.list) {
         // "&& element.weight !== 3" kan tilføjes for at gøre sorte celler til faste mure der ikke kan besøges (blokeringer)
-        if (element !== startCellObj && element.weight !== blackBlocked) {
+        if (element !== startCellObj && element.weight !== blueWater) {
             // alle elementer undtagen start pushes fra adjacencylist til priorityQueue...
             // ... elementerne har allerede "distanceFromStart = Infinity" & "predecessor = undefined" som default
             priorityQueue.insert(element);
@@ -269,7 +273,7 @@ async function dijkstraSearch(adjacencyList, startCellIndex) {
         for (const n of u.neighbours) {
             // hvis nabo noden ikke er visited (når den er visited så er den allerede opdateret med den laveste distanceFromStart)...
             // ... && hvis ikke det er en mur
-            if (!n.isVisited && n.weight !== blackBlocked) {
+            if (!n.isVisited && n.weight !== blueWater) {
                 // sammenlægger noden u's distance fra start med naboens weight, altså en beregning den samlede distance fra start til den nye nabo node...
                 const alt = u.distanceFromStart + n.weight;
 
@@ -304,9 +308,12 @@ async function calculatePath(current) {
     if (current === adjacencyList.list[startCellIndex]) {
         return;
     }
+
+    // peger på celle elementet og sender det til markPathCells
     const visualCell = document.querySelector(`#grid-container .cell[data-row="${current.row}"][data-col="${current.col}"]`);
     await view.markPathCells(visualCell);
 
+    // sætter current til dens predecessor
     current = current.predecessor;
 
     calculatePath(current);

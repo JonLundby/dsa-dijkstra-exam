@@ -47,36 +47,39 @@ input, #draw-start-checkbox, #draw-goal-checkbox{
 
 /* CELLER */
 .cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1em;
+    color: #2cb3ce;
+    font-weight: bold;
     background-color: aliceblue;
     width: 32px;
     height: 32px;
     border: 3px solid darkslategray;
     border-radius: 32%;
     aspect-ratio: 1 / 1;
-    box-sizing: border-box;
+    box-sizing: border-box;    
 }
 
 .cell.start {
-    background-color: #2a07ed;
+    background-color: #99f8f0;
 }
 
 .cell.goal {
-    background-color: #30e7d8;
+    background-color: #99f8f0;
 }
 
-.cell.whiteFlat {
+.cell.greenFlat {
     background-color: #138451;
 }
 
-.cell.greyHill {
+.cell.yellowSand {
     background-color: #F0E442;
 }
 
-.cell.blackBlocked {
-    background-color: #b90f2b;
-}
-.cell.path {
-    background-color: #5ac9df;
+.cell.blueWater {
+    background-color: blue;
 }
 
 .cell.visited {

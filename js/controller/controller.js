@@ -49,7 +49,7 @@ function startApp() {
     // animation-speed-input
     animationSpeed = document.querySelector("#animation-speed-input").value;
     document.querySelector("#animation-speed-input").addEventListener("change", () => {
-        animationSpeed = document.querySelector("#animation-speed-input").value;        
+        animationSpeed = document.querySelector("#animation-speed-input").value;
     });
 
     // Ny instans a grid grid
@@ -283,8 +283,6 @@ async function dijkstraSearch(adjacencyList, startCellIndex) {
                 // hvis den alternative distance (alt) er mindre en nabo nodens distance fra start så er der fundet en ny hurtigere rute til nabo noden...
                 // ... og denne nye distance opdateres på nabo nodens distanceFromStart property
                 if (alt < n.distanceFromStart) {
-                    // prev[nIndex].predecessor = u;
-                    // distances[nIndex].distanceFromStart = alt;
                     adjacencyList.list[nIndex].predecessor = u;
                     adjacencyList.list[nIndex].distanceFromStart = alt;
 
@@ -303,7 +301,6 @@ async function dijkstraSearch(adjacencyList, startCellIndex) {
 }
 
 async function calculatePath(current) {
-
     // base case: hvis current er start cellen så er stien fundet nbaglæns
     if (current === adjacencyList.list[startCellIndex]) {
         return;

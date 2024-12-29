@@ -3,34 +3,39 @@
 ### pseudokode
 
 ```
-dijkstra(adjacencyList, startCell) {
-    initiate empty priority queue pq
-    initiate empty dictionary{} distances
-    initiate empty dictionary{} prev
+dijkstra(adjacencyList, startCellIndex) {
+    instantiere ny PriorityQueue = priorityQueue
+    startCell = adjacencyList[startCellIndex] // finder startcellen i adjacency-listen
+    sæt startCell til at være 0 væk fra sig selv
+    sæt startCell's vægt til nul
+    sæt startCell til at være besøgt
 
-    add to distances <-- startCell, with a distance of 0
-    add to pq <-- startCell, with a distance of 0
+    tilføj startcellen til priorityQueue
 
-    for vertex v in adjacencyList {
-        if v !== start {
-            add to priority queue <-- v with a distance of infinity (expected: {A: 0, B: Infinity, C: Infinity,...})
-            add vertex to pq (expected: {A: 0, B: Infinity, C: Infinity,...})
+    for hver celle c i adjacencyList {
+        if c !== startCell {
+            indsæt alle andre celler fra adjacency-listen til priorityQueue //alle cellers distanceFromStart er Infinity som default
         }
-        add vertex to prev with value undefined (expected: {A: undefined, B: undefined, C: undefined,...})
     }
 
-    while pq is not empty {
-        current = pq.extractMinimum
+    while priorityQueue ikke er tom {
+        u = pq.extractMinimum // fjerner celle med "højeste" fra prioritets køen (cellen med mindste distance fra start)
 
-        foreach neighbour of graph[current]
-            distance = graph[current] + graph[currentNeighbour] // calculate distance from graph[current] to currentNeighbour
+        if( u === målet hvor algoritmen skal finde hen) {
+            bryd ud af while loop
+        }
 
-            if (distance < distances[currentNeighbour])
-                prev[neighbour] = graph[current] // updates route. fx {0,1: undefined} => {0,1: 0,0} travelled from 0,0 to 0,1
-                distances[neighbour] = distance // updates infinity
-                update pq(neighbour) with new distances // pq will rearrange itself
-    }
+        for hver nabo n af u
+            ny distance = u's distance fra start + n's vægt (det som det koster at gå til n)
 
-    return prev, distances // prev holds the route of the shortest path
+            if (distance < n's nuværende distance fra start)
+                n's distance fra start = ny distance
+                n's forgænger = u
+
+                // n's distance fra start opdateres og priorityQueue rearrangere sig selv
+                priorityQueue.decreasePriority(n.distanceFromStart, ny distance)
+            }
+
+    returner adjacency liste med opdaterede celler (distance fra start & forgængere)
 }
 ```

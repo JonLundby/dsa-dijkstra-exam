@@ -1,6 +1,6 @@
 # Dijkstra's algoritme
 
-![alt text](image.png)
+![alt text](assets/Dijkstra_Path_01.png)
 
 Deployet udgave: https://github.com/JonLundby/dsa-dijkstra-exam
 

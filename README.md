@@ -1,4 +1,12 @@
-# Dijkstra's algorithm
+# Dijkstra's algoritme
+
+![alt text](image.png)
+
+Deployet udgave: https://github.com/JonLundby/dsa-dijkstra-exam
+
+### Beskrivelse:
+I denne visualisering af Dijkstra’s algoritme kan man tegne med 2 farver i et grid af celler. Den ene farve (sort) repræsentere bjerge som er ufarbart terræn og den anden farve (grå) repræsentere bakker der er dyrere at rejse igennem end de grønne celler. Har man tegnet forkert kan man slette disse to farver ved at tegne over dem igen så en celle bliver grøn igen (museknappen kan holdes nede når man tegner). Man kan også tegne ”start” og ”goal” ind i griddet således får algoritmen et startpunkt at gå ud fra og et slutpunkt hvor den skal ende. Når både start og goal er sat aktiveres ”find path” knappen. Når man trykker på ”find path” knappen vil algoritmen finde den korteste (mindst kostbare) rute og tegne ruten in i griddet med hvide prikker. Undervejs vil man kunne se hvilke celler der bliver besøgt ved at iagttage det forsvindende omrids af en celle. Størrelsen på griddet kan justeres til max 50x50 og min 3x3. Desuden kan tiden justeres før eller imens algoritmen kører hvis man ønsker ændring i tempoet.
+
 
 ### pseudokode
 

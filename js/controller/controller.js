@@ -65,6 +65,13 @@ function startApp() {
 
     // find path btn
     document.querySelector("#find-path-btn").addEventListener("click", () => {
+        const drawStart = document.querySelector("#draw-start-checkbox");
+        const drawGoal = document.querySelector("#draw-goal-checkbox");
+        const drawSelection = document.querySelector("#select-draw");
+        drawStart.disabled = true;
+        drawGoal.disabled = true;
+        drawSelection.disabled = true;
+
         gridToAdjacencyList(grid);
         dijkstraSearch(adjacencyList, startCellIndex);
     });
@@ -111,6 +118,7 @@ function startApp() {
     // mousedown aktivere "viskelæder" eller "blyant" alt efter hvad event.target.classList indeholder...
     // ... og kalder updateDrawingGrid (kun så længe mousedown sker over grid-container elementet)
     document.querySelector("#grid-container").addEventListener("mousedown", (e) => {
+        // bestemmer om der tegnes eller slettes
         if (e.target.classList.contains("greenFlat")) {
             isDrawing = true;
             isErasing = false;
@@ -123,13 +131,32 @@ function startApp() {
 
     // lytter på mousemove og kalder updateDrawingGrid hvis isDrawing eller isErasing er true
     document.querySelector("#grid-container").addEventListener("mousemove", (e) => {
-        if (isDrawing || isErasing) {
+        if ((isDrawing || isErasing) && !isDrawingStart && !isDrawingGoal) {
             updateDrawingGrid(e);
         }
     });
 
     // lytter på mouseup og deaktivere drawing og erasing
     document.addEventListener("mouseup", () => {
+        const drawStart = document.querySelector("#draw-start-checkbox");
+        const drawGoal = document.querySelector("#draw-goal-checkbox");
+        const drawSelection = document.querySelector("#select-draw");
+        // resetter om man tegner start og/eller goal
+        if (isDrawingStart || isDrawingGoal) {
+            drawStart.checked = false;
+            drawGoal.checked = false;
+
+            drawStart.disabled = false;
+            drawGoal.disabled = false;
+
+            isDrawingStart = false;
+            isDrawingGoal = false;
+
+            drawSelection.disabled = false;
+            selectedDrawType = greyHill;
+        }
+
+        // resetter om man tegner eller sletter
         isDrawing = false;
         isErasing = false;
     });

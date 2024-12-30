@@ -1,50 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="#" type="image/x-icon">
-    <link rel="stylesheet" href="style.css">
-    <title>Dijkstra</title>
-</head>
-<body>
-    <h1>Dijkstras algorithm</h1>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="shortcut icon" href="#" type="image/x-icon" />
+        <link rel="stylesheet" href="style.css" />
+        <title>Dijkstra</title>
+    </head>
+    <body>
+        <h1>Dijkstras algorithm</h1>
 
-    <!-- <h4>control panel</h4> -->
-    <section id="control-panel">
-        <!-- change grid size -->
-        <label for="row-size-input">rows:</label>
-        <input type="number" name="row-size-input" id="row-size-input" value="16" min="3" max="50">
-        <label for="col-size-input">colums:</label>
-        <input type="number" name="col-size-input" id="col-size-input" value="32" min="3" max="50">
-        
-        <!-- select draw type -->
-        <label for="select-draw">select draw</label>
-        <select name="select-draw" id="select-draw">
-            <!-- <option value="0">start</option> -->
-            <option value="3">Hills (expensive)</option>
-            <option value="4">Mountain (blocked)</option>
-            <!-- <option value="4">goal</option> -->
-        </select>
-        
-        <!-- animation speed -->
-        <label for="animation-speed-input">speed(ms):</label>
-        <input type="number" name="animation-speed-input" id="animation-speed-input" value="30" max="10000">
+        <!-- <h4>control panel</h4> -->
+        <section id="control-panel">
+            <!-- change grid size -->
+            <div>
+                <label for="row-size-input">rows:</label>
+                <input type="number" name="row-size-input" id="row-size-input" value="16" min="3" max="50" />
+                <label for="col-size-input">colums:</label>
+                <input type="number" name="col-size-input" id="col-size-input" value="32" min="3" max="50" />
+            </div>
+                        
+            <!-- select draw type -->
+            <div>
+                <label for="select-draw">select draw</label>
+                <select name="select-draw" id="select-draw">
+                    <!-- <option value="0">start</option> -->
+                    <option value="3">Hills (expensive)</option>
+                    <option value="4">Mountain (blocked)</option>
+                    <!-- <option value="4">goal</option> -->
+                </select>
+            </div>
 
-        <!-- find path/search -->
-        <button id="find-path-btn">Find path</button>
+            <!-- set start/goal -->
+            <div>
+                <label for="draw-start-checkbox">draw start:</label>
+                <input type="checkbox" name="draw-start" id="draw-start-checkbox" />
+                <label for="draw-goal-checkbox">draw goal:</label>
+                <input type="checkbox" name="draw-goal" id="draw-goal-checkbox" />
+            </div>
+                        
+            <!-- animation speed -->
+            <div>
+                <label for="animation-speed-input">speed(ms):</label>
+                <input type="number" name="animation-speed-input" id="animation-speed-input" value="30" max="10000" />
+            </div>
+                        
+            <!-- find path/search -->
+            <button id="find-path-btn">Find path</button>
+            <button id="reset-btn">reset</button>
+        </section>
 
-        <!-- set start/goal -->
-        <label for="draw-start-checkbox">draw start:</label>
-        <input type="checkbox" name="draw-start" id="draw-start-checkbox">
-        <label for="draw-goal-checkbox">draw goal:</label>
-        <input type="checkbox" name="draw-goal" id="draw-goal-checkbox">
-    </section>
+        <section id="grid-container">
+            <!-- celler indsættes her -->
+        </section>
 
-    <section id="grid-container">
-        <!-- celler indsættes her -->
-    </section>
-    
-    <script type="module" src="./js/controller/controller.js"></script>
-</body>
+        <script type="module" src="./js/controller/controller.js"></script>
+    </body>
 </html>

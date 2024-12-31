@@ -159,6 +159,15 @@ function startApp() {
         isDrawing = false;
         isErasing = false;
     });
+
+    // reset
+    document.querySelector("#reset-btn").addEventListener("click", () => {
+        resizeGrid()
+        document.querySelector("#find-path-btn").disabled = true;
+        document.querySelector("#select-draw").disabled = false;
+        document.querySelector("#draw-start-checkbox").disabled = false;
+        document.querySelector("#draw-goal-checkbox").disabled = false;
+    });
 }
 
 // ændre grid størrelse og opdaterer model

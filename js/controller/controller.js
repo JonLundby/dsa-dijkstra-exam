@@ -54,7 +54,6 @@ function startApp() {
 
     // Ny instans a grid grid
     grid = new Grid(GRID_ROWS_SIZE, GRID_ROWS_SIZE, greenFlat);
-    // goalCellIndex = grid.rows * grid.cols;
 
     resizeGrid();
 
@@ -119,7 +118,7 @@ function startApp() {
     // ... og kalder updateDrawingGrid (kun så længe mousedown sker over grid-container elementet)
     document.querySelector("#grid-container").addEventListener("mousedown", (e) => {
         // bestemmer om der tegnes eller slettes
-        if (e.target.classList.contains("greenFlat")) {
+        if (e.target.classList.contains("greenFlat") || selectedDrawType === greenStart || selectedDrawType === blueGoal) {
             isDrawing = true;
             isErasing = false;
         } else {
@@ -215,7 +214,7 @@ function setStartCell(cell) {
     const col = parseInt(cell.dataset.col);
     startCellIndex = row * grid.cols + col;
 
-    // check om start og goal er sat
+    // check om start og goal er sat så find-path-btn kan aktiveres
     if (startCellIndex > -1 && goalCellIndex > -1) {
         document.querySelector("#find-path-btn").disabled = false;
     }
@@ -226,7 +225,7 @@ function setGoalCell(cell) {
     const col = parseInt(cell.dataset.col);
     goalCellIndex = row * grid.cols + col;
 
-    // check om start og goal er sat
+    // check om start og goal er sat så find-path-btn kan aktiveres
     if (startCellIndex > -1 && goalCellIndex > -1) {
         document.querySelector("#find-path-btn").disabled = false;
     }
@@ -253,26 +252,6 @@ function gridToAdjacencyList(grid) {
             node.neighbours.push(nFromAdjacencyList);
         }
     }
-
-    // // gennemgår griddet igen og finder hver celles index svarende til det fra adjacencylisten
-    // for (let row = 0; row < grid.rows; row++) {
-    //     for (let col = 0; col < grid.cols; col++) {
-    //         const cellIndex = row * grid.cols + col;
-    //         const currentCell = adjacencyList.list[cellIndex];
-
-    //         // finder naboer til celle via griddet
-    //         const neighbours = grid.neighbours(row, col);
-
-    //         // hver nabo hentes fra adjacencylisten og pushes til currentCells neighbours..
-    //         // ... vigtigt at cellens naboer findes fra adjacencylisten således at de senere har den samme reference i priority queue
-    //         for (const n of neighbours) {
-    //             // finder naboens index fra griddet som er svarende til index i adjacencylisten
-    //             const nIndex = grid.indexFor(n.row, n.col);
-    //             const nFromAdjacencyList = adjacencyList.list[nIndex];
-    //             currentCell.neighbours.push(nFromAdjacencyList);
-    //         }
-    //     }
-    // }
 }
 
 async function dijkstraSearch(adjacencyList, startCellIndex) {
